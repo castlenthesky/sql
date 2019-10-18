@@ -2,7 +2,7 @@
 This repository houses a collection of SQL templates and tools useful for gathering and summarizing data.
 
 ## First Day of the Month
-There are numerous ways to transform date data into the first day of the month. T-SQL offers a handy function which returns the day at the end of the month titled `EOMONTH`, but there is no such function for the first day of the month. One common solution with the looks like this: 
+There are numerous ways to transform date data into the first day of the month. T-SQL offers a handy function which returns the day at the end of the month titled `EOMONTH`, but there is no such function for the first day of the month. One common solution looks like this: 
 ```sql 
 DATEADD(mm, DATEDIFF(mm, 0, '2018-05-15'), 0) -- Returns '2018-05-01
 ```
