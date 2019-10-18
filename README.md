@@ -1,5 +1,5 @@
 # SQL - Tools and Templates
-This repository houses a collection of SQL templates and tools developed by Brian Henson.
+This repository houses a collection of SQL templates and tools useful for gathering and summarizing data.
 
 ## First Day of the Month
 There are numerous ways to transform date data into the first day of the month. T-SQL offers a handy function which returns the day at the end of the month titled `EOMONTH`, but there is no such function for the first day of the month. One common solution with the looks like this: 
@@ -7,7 +7,7 @@ There are numerous ways to transform date data into the first day of the month. 
 DATEADD(mm, DATEDIFF(mm, 0, '2018-05-15'), 0) -- Returns '2018-05-01
 ```
 
-Breaking down this function to understand how it works is somewhat cumbersom and requires a user to understand how computers translate dates. Basicially it reads, *"Give me the number of months between the date in question and the beginning of computer time, then add that number of months to the beggining of computer time."*
+Breaking down this function to understand how it works is somewhat cumbersom and requires a user to understand how computers calculates dates. Basicially it reads, *"Give me the number of months between the date in question and the beginning of computer time, then add that number of months to the beggining of computer time."*
 
 A much better solution which not only runs faster, but also  allows less-advanced users to understand the code looks like this:
 
@@ -16,7 +16,7 @@ DATEADD(dd, 1, EOMONTH('2018-05-15', -1)) -- Returns '2018-05-01
 ```
 In plain english: *"Give me the last day of the month previous to the date in question, then add one day to that."*
 
-Both codes only call two function, but one is nonsensical and computationally heavier than the other. Good code is not only performant, but also readable. Besides, if nobody can read or understand your code, how can it be maintained?
+Both codes only call two function, but one is nonsensical and computationally heavier than the other. Good code is not only performant, but also readable. After all, if nobody can read or understand your code, how can it be maintained?
 
 ## Bucketizing Data
 I like distribution charts. A LOT. They're one of the most useful tools in data exploration and can tell you so much so quickly. Sometimes, when an analyst is dealing with non-discrete data, it can be helpful to first transform their dataset into "buckets" of data. Your wish is my command.
@@ -26,11 +26,11 @@ DECLARE @bucket_size INT = 10;
 FLOOR(([data_field] + (@bucket_size - 1)) / @bucket_size) * @bucket_size [Bucketized Field]
 ```
 
-The above code will bucketize the given field and group results into bins of 10. Easy-peazy.
+The above code will bucketize the given field and group results into bins of 10. Easy-peazy. Modify your `bucket_size` variable to adjust for your specific dataset.
 
 ## Sequential Numbering
 
-Sometimes you want a list of numbers to run calculations on or to aggregate against. Here's how you do that:
+Sometimes you want a list of numbers to run calculations on or to aggregate against. Here's how you do that in a blazin' fast way.
 
 ```sql
 WITH 
@@ -50,7 +50,7 @@ FROM E8
 
 ## Dynamic Pivot Table
 
-Pivoting data within SQL is a cumbersom task. Pivoting dynamic data within SQL is doubly so. This script makes pivoting data as simple as counting to three. 
+Pivoting data within SQL is not easy. Pivoting dynamic data within SQL is really not easy. This script makes pivoting data as simple as counting to three. It handles the pivot by using executing a dynamic query - sometimes fowned upon for security reasons. If you're pulling data internally and not exposing the dynamic query to an external API, nothing to worry about and you can enjoy simple, next-to-effortless pivot tables in SQL.
 
 ```sql
 -- ############ Declare and Set Variables ############
@@ -96,7 +96,7 @@ DECLARE @PivotColumnNames       AS NVARCHAR(MAX)
 SELECT
   @PivotColumnNames = ISNULL(@PivotColumnNames + ',','') + QUOTENAME(column_set.pivot_columns)
 FROM (
-  -- Returns a distinct list of values identified as column names.
+  -- Returns a distinct list of values identified as column names and sorts them.
   SELECT DISTINCT
   td.pivot_columns
     FROM #temp_data td
@@ -117,7 +117,7 @@ FROM (
 ORDER BY
   pivotdata.pivot_columns
 
---Prepare the PIVOT query using the dynamic fields found above.
+--Prepare the PIVOT query using the dynamic fields found above, and SUM the values.
 SET @DynamicPivotQuery =
 N'SELECT [pivot_rows] as ' + @rowLabel + ', ' + @PivotSelectColumnNames + '
 FROM #temp_data
